@@ -1,0 +1,44 @@
+plugins {
+    id "com.android.application"
+    id "kotlin-android"
+    id "dev.flutter.flutter-gradle-plugin"
+}
+
+android {
+    namespace "br.com.thiagobarros.estudato"
+    compileSdk flutter.compileSdkVersion
+    ndkVersion flutter.ndkVersion
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    kotlinOptions {
+        jvmTarget = JavaVersion.VERSION_1_8
+    }
+
+    defaultConfig {
+        applicationId "br.com.thiagobarros.estudato"
+        // Compatível com a maioria dos aparelhos Android em uso (Android 5.0+).
+        minSdkVersion flutter.minSdkVersion
+        targetSdkVersion flutter.targetSdkVersion
+        versionCode flutter.versionCode
+        versionName flutter.versionName
+    }
+
+    buildTypes {
+        release {
+            // Assinado com a chave de debug por padrão, só para simplificar
+            // `flutter run --release` e testes locais. Para publicar de
+            // verdade (ex.: Google Play), configure sua própria chave de
+            // release — veja a documentação oficial do Flutter sobre
+            // "Sign the app" (Build and release an Android app).
+            signingConfig signingConfigs.debug
+        }
+    }
+}
+
+flutter {
+    source "../.."
+}

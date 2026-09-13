@@ -1,0 +1,9 @@
+# Android Studio will place build artifacts here
+app/debug
+app/profile
+app/release
+.gradle
+.kotlin
+.widget_preview
+local.properties
+gradle/wrapper/*.jar

@@ -1,0 +1,11 @@
+analyzer:
+  exclude:
+    - build/**
+    - android/**
+    - web/**
+include: package:flutter_lints/flutter.yaml
+
+linter:
+  rules:
+    # Mantemos as regras padrão do flutter_lints. Ajuste aqui se quiser
+    # habilitar/desabilitar regras específicas conforme o projeto evoluir.
