@@ -28,6 +28,7 @@ O projeto conta com suporte dinâmico a **múltiplos cargos de Nível Médio e N
 A banca **FGV** possui um perfil reconhecido por enunciados contextualizados, interpretações apuradas e cobrança aprofundada de legislação e conhecimentos técnicos aplicados.
 
 O **Estuda APP** foi concebido para proporcionar uma experiência de estudo direcionada, ágil e livre de distrações:
+
 1. **Fidelidade ao Edital**: Aplica as regras dos itens 11.6.1 (Nível Médio) e 11.6.2 (Nível Superior) do certame.
 2. **100% Funcional Offline**: Não requer conexão com a internet para carregar questões ou salvar históricos.
 3. **Privacidade Total**: Todos os dados de desempenho são mantidos localmente no aparelho do usuário via `shared_preferences`.
@@ -53,6 +54,7 @@ O aplicativo possui matriz de conteúdos segregada por nível de escolaridade, a
 ### Cargos Contemplados
 
 #### 🎓 Nível Superior
+
 - **Administrador Hospitalar**: Gestão financeira/contábil hospitalar, Custeio ABC, Faturamento SUS (AIH/APAC), Nova Lei de Licitações (Lei 14.133/2021) e indicadores de gestão de leitos.
 - **Assistente Social**: Seguridade Social, Parâmetros de Atuação no SUS (CFESS), ECA, Estatuto do Idoso e mediação interdisciplinar.
 - **Auditor em Saúde**: Sistema Nacional de Auditoria (SNA), auditoria analítica/operativa/concorrente, conformidade regulatória e controle social no SUS.
@@ -60,6 +62,7 @@ O aplicativo possui matriz de conteúdos segregada por nível de escolaridade, a
 - **Gestor em Saúde**: Planejamento estratégico público, Balanced Scorecard (BSC) adaptado ao setor de saúde e Gestão por Competências (CHA).
 
 #### 🩺 Nível Médio
+
 - **Técnico em Enfermagem** *(Cargo padrão)*: Procedimentos e técnicas de enfermagem, biossegurança, clínica médica, urgência/emergência, cálculo de medicação e PNI.
 - **Assistente de Serviços de Saúde**: Atendimento humanizado (PNH), sigilo e guarda de prontuários, regulação ambulatorial e rotinas administrativas hospitalares.
 - **Instrumentador Cirúrgico**: Tempos cirúrgicos (diérese, hemostasia, exérese, síntese), montagem da mesa cirúrgica, técnicas assépticas e esterilização.
@@ -105,6 +108,7 @@ Para que simulados rápidos (por exemplo, de 20 questões) representem fielmente
 ### Histórico e Estatísticas Locais
 
 A camada de dados (`HistoryService`) utiliza o pacote `shared_preferences` serializando e desserializando instâncias de `QuizSession` em formato JSON, garantindo:
+
 - Carregamento assíncrono instantâneo via `FutureBuilder`.
 - Preservação do cargo prestado e do detalhamento matéria a matéria mesmo após fechar o aplicativo.
 
@@ -167,23 +171,27 @@ estuda-app/
 ## 🚀 Como Rodar
 
 ### Pré-requisitos
+
 - [Flutter SDK](https://docs.flutter.dev/get-started/install) instalado (versão 3.3.0 ou superior).
 - Dispositivo Android com depuração USB ativada, emulador configurado ou Google Chrome para execução Web.
 
 ### Passo a Passo
 
-1. Clone o repositório:
+- Clone o repositório:
+
 ```bash
 git clone https://github.com/thiago-barros-souza/estuda-app.git
 cd estuda-app
 ```
 
-2. Obtenha as dependências:
+- Obtenha as dependências:
+
 ```bash
 flutter pub get
 ```
 
-3. Execute a aplicação:
+- Execute a aplicação:
+
 ```bash
 # Executar em dispositivo ou emulador conectado
 flutter run
@@ -206,7 +214,8 @@ flutter test
 flutter analyze
 ```
 
-### O que os testes verificam:
+### O que os testes verificam
+
 - **Renderização e Usabilidade**: Renderização dos elementos da tela inicial, seletor de cargo e ação de início de simulado.
 - **Conformidade com o Edital**: Valida que cargos de Nível Superior não possuem a disciplina de Informática Básica e possuem 30 questões de Conhecimentos Específicos, enquanto Nível Médio contém Informática e 25 questões de Específicas.
 - **Distribuição do QuizEngine**: Garante que o motor gera filas válidas, balanceadas e com itens específicos do cargo selecionado.
@@ -220,6 +229,7 @@ flutter analyze
 ```bash
 flutter build apk --release
 ```
+
 O arquivo `.apk` gerado estará disponível em:
 `build/app/outputs/flutter-apk/app-release.apk`
 
@@ -230,6 +240,7 @@ O arquivo `.apk` gerado estará disponível em:
 ```bash
 flutter build web --release
 ```
+
 Os arquivos estáticos serão gerados na pasta `build/web/`, prontos para deploy no GitHub Pages, Vercel ou Firebase Hosting.
 
 ---
