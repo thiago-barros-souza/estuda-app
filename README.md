@@ -1,82 +1,243 @@
-# Estuda APP
+# 📚 Estuda APP — Simulados SES/SECAD-TO (FGV)
 
-App de simulados para o concurso **SES/SECAD-TO** (Edital nº 001/2026, banca **FGV**) — cargo de **Técnico de Enfermagem**.
+Aplicativo moderno e offline de simulados para concursos públicos desenvolvido em **Flutter**, estruturado rigorosamente com base no **Edital nº 001/2026** do concurso **SES/SECAD-TO** (Secretaria de Estado da Saúde e Secretaria da Administração do Estado do Tocantins), sob organização da banca **FGV (Fundação Getulio Vargas)**.
 
-Reimplementação em **Flutter** do protótipo web (`/home/claude/quizapp` na sessão original), com a mesma lógica e o mesmo banco de questões, agora como projeto Android nativo de verdade (via Flutter), pronto para você continuar evoluindo.
+O projeto conta com suporte dinâmico a **múltiplos cargos de Nível Médio e Nível Superior**, respeitando a matriz de disciplinas, pesos oficiais, distribuição proporcional por amostragem matemática e persistência de desempenho no próprio dispositivo.
 
-## O que o app faz
+---
 
-- Você escolhe a quantidade de questões (padrão 20, de 5 a 60) e pode treinar todas as matérias juntas — na mesma proporção de peso da prova oficial (60 questões: Português 10, Matemática/Raciocínio Lógico 7, Informática 7, História/Geografia do TO 6, Legislação do SUS 5, Conhecimentos Específicos de Enfermagem 25) — ou uma matéria específica.
-- As questões aparecem em ordem aleatória, no formato de 5 alternativas (A–E) usado pela FGV.
-- Ao responder, o app mostra na hora se você acertou, qual é a alternativa correta e uma explicação.
-- No final, uma tela de resultado mostra sua pontuação geral e o desempenho por matéria.
-- Todo simulado concluído fica salvo no **histórico de desempenho** do aparelho (via `shared_preferences`), com média, melhor resultado e um gráfico simples de evolução ao longo do tempo.
+## 📑 Sumário
 
-O banco de questões é **autoral** — 103 questões originais, escritas no estilo e formato da FGV e a partir do conteúdo programático do edital, e não reproduções de provas reais (que são protegidas por direitos autorais). Veja `lib/data/questions_data.dart`.
+- [Visão Geral e Contexto](#-visão-geral-e-contexto)
+- [Cargos Suportados & Regras do Edital](#-cargos-suportados--regras-do-edital)
+- [Funcionalidades Principais](#-funcionalidades-principais)
+- [Destaques Técnicos](#-destaques-técnicos)
+  - [Motor de Simulados Inteligente (`QuizEngine`)](#motor-de-simulados-inteligente-quizengine)
+  - [Histórico e Estatísticas Locais](#histórico-e-estatísticas-locais)
+- [Banco de Questões Autoral](#-banco-de-questões-autoral)
+- [Estrutura do Projeto](#-estrutura-do-projeto)
+- [Como Rodar](#-como-rodar)
+- [Testes e Garantia de Qualidade](#-testes-e-garantia-de-qualidade)
+- [Geração de Build (Android APK & Web)](#-geração-de-build-android-apk--web)
+- [Próximos Passos e Extensibilidade](#-próximos-passos-e-extensibilidade)
 
-## Estrutura do projeto
+---
 
+## 🎯 Visão Geral e Contexto
+
+A banca **FGV** possui um perfil reconhecido por enunciados contextualizados, interpretações apuradas e cobrança aprofundada de legislação e conhecimentos técnicos aplicados.
+
+O **Estuda APP** foi concebido para proporcionar uma experiência de estudo direcionada, ágil e livre de distrações:
+1. **Fidelidade ao Edital**: Aplica as regras dos itens 11.6.1 (Nível Médio) e 11.6.2 (Nível Superior) do certame.
+2. **100% Funcional Offline**: Não requer conexão com a internet para carregar questões ou salvar históricos.
+3. **Privacidade Total**: Todos os dados de desempenho são mantidos localmente no aparelho do usuário via `shared_preferences`.
+
+---
+
+## 🏛️ Cargos Suportados & Regras do Edital
+
+O aplicativo possui matriz de conteúdos segregada por nível de escolaridade, adaptando automaticamente o painel de matérias e pesos conforme o cargo selecionado na tela inicial:
+
+### Matriz de Distribuição Oficial (60 Questões)
+
+| Disciplina | Nível Médio (Item 11.6.1) | Nível Superior (Item 11.6.2) |
+| :--- | :---: | :---: |
+| **Língua Portuguesa** | 10 questões | 10 questões |
+| **Matemática e Raciocínio Lógico** | 7 questões | 8 questões |
+| **Informática Básica** | 7 questões | *Não exigido no edital* |
+| **História e Geografia do Tocantins** | 6 questões | 6 questões |
+| **Legislação do SUS** | 5 questões | 6 questões |
+| **Conhecimentos Específicos** | 25 questões | 30 questões |
+| **Total de Questões da Prova** | **60 questões** | **60 questões** |
+
+### Cargos Contemplados
+
+#### 🎓 Nível Superior
+- **Administrador Hospitalar**: Gestão financeira/contábil hospitalar, Custeio ABC, Faturamento SUS (AIH/APAC), Nova Lei de Licitações (Lei 14.133/2021) e indicadores de gestão de leitos.
+- **Assistente Social**: Seguridade Social, Parâmetros de Atuação no SUS (CFESS), ECA, Estatuto do Idoso e mediação interdisciplinar.
+- **Auditor em Saúde**: Sistema Nacional de Auditoria (SNA), auditoria analítica/operativa/concorrente, conformidade regulatória e controle social no SUS.
+- **Executivo em Saúde**: Governança em saúde pública, vigilância sanitária (Anvisa), contratualização e diretrizes do planejamento regional integrado.
+- **Gestor em Saúde**: Planejamento estratégico público, Balanced Scorecard (BSC) adaptado ao setor de saúde e Gestão por Competências (CHA).
+
+#### 🩺 Nível Médio
+- **Técnico em Enfermagem** *(Cargo padrão)*: Procedimentos e técnicas de enfermagem, biossegurança, clínica médica, urgência/emergência, cálculo de medicação e PNI.
+- **Assistente de Serviços de Saúde**: Atendimento humanizado (PNH), sigilo e guarda de prontuários, regulação ambulatorial e rotinas administrativas hospitalares.
+- **Instrumentador Cirúrgico**: Tempos cirúrgicos (diérese, hemostasia, exérese, síntese), montagem da mesa cirúrgica, técnicas assépticas e esterilização.
+- **Técnico em Saúde Bucal (TSB)**: Instrumentais odontológicos, isolamento do campo operatório, profilaxia, ergonomia e biossegurança em odontologia.
+
+---
+
+## ✨ Funcionalidades Principais
+
+- 🔄 **Seletor Dinâmico de Cargo e Escolaridade**: Altera instantaneamente as matérias, pesos e pool de questões de Conhecimentos Específicos na Home.
+- 🎛️ **Configuração Flexível do Simulado**:
+  - **Simulado Completo**: Treino geral ponderado com a mesma proporção da prova real da FGV.
+  - **Estudo Dirigido**: Prática focada em uma matéria isolada (ex.: apenas *Legislação do SUS* ou apenas *História e Geografia do Tocantins*).
+  - **Seleção de Quantidade**: De 5 a 60 questões por sessão.
+- ⚡ **Resolução Interativa com Gabarito Comentado**:
+  - Feedback visual imediato após responder (destaque em verde para alternativa correta e vermelho para eventual erro).
+  - Justificativa pedagógica imediata explicando a fundamentação da resposta correta.
+  - Barra de progresso contínua com contador de questões.
+- 📊 **Relatório de Desempenho Pós-Simulado**:
+  - Percentual global de aproveitamento com mensagem avaliativa.
+  - Barras de progresso com taxa de acertos discriminada matéria por matéria.
+  - Atalhos para repetir novo simulado ou analisar o histórico acumulado.
+- 📈 **Painel de Histórico e Evolução**:
+  - Indicadores globais consolidados: total de simulados concluídos, total de questões respondidas, média geral de aproveitamento (%) e melhor resultado alcançado.
+  - Gráfico visual de barras demonstrando a evolução temporal dos simulados.
+  - Lista detalhada de cada sessão com data, cargo disputado, modalidade e desempenho por matéria.
+  - Opção para zerar o histórico com diálogo de confirmação.
+
+---
+
+## 🛠️ Destaques Técnicos
+
+### Motor de Simulados Inteligente (`QuizEngine`)
+
+Para que simulados rápidos (por exemplo, de 20 questões) representem fielmente o equilíbrio da prova de 60 questões, o `QuizEngine` implementa o **Método dos Maiores Restos (Algoritmo de Hamilton)**:
+
+1. Calcula a cota exata de cada disciplina com base no peso oficial do edital.
+2. Atribui a parte inteira de cada matéria.
+3. Distribui as vagas restantes ordenando pelas maiores frações decimais residuais.
+4. Aplica trava de segurança (`poolSize`) para respeitar o limite disponível no banco de questões e redistribuir eventuais excedentes sem estourar o limite de questões.
+5. Embaralha as questões de forma não-viciada (Fisher-Yates) para garantir simulados sempre diversificados.
+
+### Histórico e Estatísticas Locais
+
+A camada de dados (`HistoryService`) utiliza o pacote `shared_preferences` serializando e desserializando instâncias de `QuizSession` em formato JSON, garantindo:
+- Carregamento assíncrono instantâneo via `FutureBuilder`.
+- Preservação do cargo prestado e do detalhamento matéria a matéria mesmo após fechar o aplicativo.
+
+---
+
+## 📖 Banco de Questões Autoral
+
+O repositório conta com **151 questões inéditas** formuladas especificamente no estilo da banca FGV (enunciados densos, 5 alternativas A–E, situações-problema e justificativas completas):
+
+- **Língua Portuguesa** (10 questões): Gramática normativa, regência verbal/nominal, crase, concordância, sintaxe e colocação pronominal.
+- **Matemática e Raciocínio Lógico** (7 questões): Lógica proposicional, equivalências, tabela-verdade, porcentagem, razão e proporção.
+- **Informática Básica** (7 questões): Segurança da informação, suíte de escritório, atalhos do Windows, navegação web e cloud.
+- **História e Geografia do Tocantins** (6 questões): Criação do Estado do Tocantins (CF/88), transferência da capital para Palmas, bioma Cerrado, bacia Araguaia-Tocantins, economia e demografia tocantinense.
+- **Legislação do SUS** (5 questões): Lei 8.080/1990, Lei 8.142/1990, princípios do SUS (universalidade, integralidade, equidade), descentralização e participação popular.
+- **Conhecimentos Específicos**:
+  - Técnico em Enfermagem: 28 questões
+  - 8 outros cargos (Nível Médio e Superior): 48 questões (6 questões aprofundadas para cada cargo)
+
+> 🛡️ **Nota Legal**: Todas as questões são produções intelectuais autorais criadas a partir do conteúdo programático do edital, respeitando integralmente a legislação de direitos autorais e as diretrizes de provas oficiais.
+
+---
+
+## 📂 Estrutura do Projeto
+
+```text
+estuda-app/
+├── lib/
+│   ├── main.dart                 # Inicialização do app, paleta de cores e tema global (Material 3)
+│   ├── models/
+│   │   ├── job_role.dart         # Definição de cargos, níveis de escolaridade e metadados
+│   │   ├── question.dart         # Modelo imutável de questão (texto, opções, índice correto, explicação)
+│   │   ├── subject.dart          # Modelo de disciplina com chave identificadora e peso no edital
+│   │   └── quiz_session.dart     # Modelo de sessão concluída para estatísticas e histórico
+│   ├── data/
+│   │   ├── subjects.dart         # Regras de disciplinas e pesos (Nível Médio vs Nível Superior)
+│   │   ├── questions_data.dart   # Banco central com questões gerais e do cargo de enfermagem
+│   │   └── role_questions.dart   # Questões específicas dos demais 8 cargos de nível médio e superior
+│   ├── services/
+│   │   ├── quiz_engine.dart      # Algoritmo de amostragem proporcional e montagem de fila
+│   │   └── history_service.dart  # Persistência local do histórico (SharedPreferences)
+│   ├── screens/
+│   │   ├── home_screen.dart      # Configuração do simulado e seletor de cargo/disciplina
+│   │   ├── quiz_screen.dart      # Tela de resolução de questões com feedback imediato
+│   │   ├── result_screen.dart    # Exibição de resultados e detalhamento por disciplina
+│   │   └── history_screen.dart   # Dashboard de desempenho, gráfico e histórico detalhado
+│   └── widgets/
+│       └── app_card.dart         # Card estilizado reutilizável nas telas da aplicação
+├── test/
+│   └── widget_test.dart          # Testes automatizados (Widgets, Regras do Edital e QuizEngine)
+├── android/                      # Projeto nativo Android configurado
+├── web/                          # Suporte nativo para execução web
+├── assets/
+│   └── icon/icon.png             # Ícone da aplicação
+├── pubspec.yaml                  # Manifesto do projeto e dependências Flutter
+└── README.md                     # Documentação completa do projeto
 ```
-lib/
-  main.dart                  # entrada do app, tema (MaterialApp)
-  models/
-    question.dart            # modelo de uma questão
-    subject.dart             # modelo de uma matéria (chave, nome, peso na prova)
-    quiz_session.dart        # modelo de uma sessão de simulado concluída (para o histórico)
-  data/
-    subjects.dart            # as 6 matérias do edital, com seus pesos
-    questions_data.dart      # banco de 103 questões (gerado a partir do protótipo web)
-  services/
-    quiz_engine.dart         # sorteio/distribuição proporcional das questões de uma sessão
-    history_service.dart     # persistência do histórico (SharedPreferences)
-  screens/
-    home_screen.dart         # tela inicial (quantidade, matéria, iniciar/histórico)
-    quiz_screen.dart         # tela do simulado (pergunta, alternativas, feedback)
-    result_screen.dart       # tela de resultado final
-    history_screen.dart      # tela de histórico de desempenho
-  widgets/
-    app_card.dart            # cartão padrão usado nas telas
-android/                     # projeto Android padrão gerado para o Flutter
-assets/icon/icon.png         # ícone provisório do app (ver "Próximos passos")
-```
 
-Arquitetura propositalmente simples (StatefulWidget + `setState`, sem Provider/Bloc/Riverpod) — é um app pessoal de estudo, então o objetivo foi manter fácil de ler e mexer. Se o projeto crescer bastante, vale considerar um gerenciador de estado, mas não é necessário hoje.
+---
 
-## Como rodar
+## 🚀 Como Rodar
 
-Pré-requisitos: [Flutter SDK](https://docs.flutter.dev/get-started/install) instalado (channel stable) e um emulador Android ou aparelho físico com depuração USB habilitada.
+### Pré-requisitos
+- [Flutter SDK](https://docs.flutter.dev/get-started/install) instalado (versão 3.3.0 ou superior).
+- Dispositivo Android com depuração USB ativada, emulador configurado ou Google Chrome para execução Web.
 
+### Passo a Passo
+
+1. Clone o repositório:
 ```bash
-cd estuda_app
+git clone https://github.com/thiago-barros-souza/estuda-app.git
+cd estuda-app
+```
+
+2. Obtenha as dependências:
+```bash
 flutter pub get
+```
+
+3. Execute a aplicação:
+```bash
+# Executar em dispositivo ou emulador conectado
 flutter run
+
+# Ou executar diretamente no navegador Web
+flutter run -d chrome
 ```
 
-Para gerar um `.apk` para instalar direto no celular:
+---
+
+## 🧪 Testes e Garantia de Qualidade
+
+O projeto conta com suíte automatizada de testes cobrindo interface, integridade das regras do edital e algoritmos matemáticos:
 
 ```bash
-flutter build apk --release
-# gera em build/app/outputs/flutter-apk/app-release.apk
-```
+# Executar suíte de testes unitários e de widgets
+flutter test
 
-> **Nota sobre a assinatura:** por padrão o `build.gradle` do app está configurado para assinar o release com a **chave de debug** (só para simplificar testes locais). Isso é suficiente para instalar no seu próprio aparelho, mas **não** deve ser usado para publicar na Google Play. Se for publicar de verdade, siga o guia oficial ["Sign the app" na documentação do Flutter](https://docs.flutter.dev/deployment/android#signing-the-app) para gerar sua própria chave de release.
-
-## ⚠️ Importante: este projeto não foi compilado/testado com o Flutter de verdade
-
-Este projeto foi gerado em um ambiente sem acesso ao SDK do Flutter nem ao `pub.dev` (repositório de pacotes), então **não foi possível rodar `flutter pub get`, `flutter analyze` nem compilar o app** para validar 100% antes da entrega. O código Dart foi escrito e revisado com cuidado (inclusive com verificação automatizada de balanceamento de parênteses/colchetes em todos os arquivos), mas a primeira coisa a fazer ao abrir o projeto na sua máquina é:
-
-```bash
-flutter pub get
+# Executar análise estática de código (linter oficial do Flutter)
 flutter analyze
 ```
 
-e corrigir qualquer eventual apontamento — principalmente coisas pequenas e específicas de versão do Flutter/Dart instalada (nomes de propriedades de tema, etc.), já que o próprio Flutter muda pequenos detalhes de API entre versões. Se o `android/` gerado aqui conflitar com o que a sua versão do Flutter espera, a forma mais segura de resolver é: mover `android/` para fora da pasta temporariamente, rodar `flutter create .` (recria `android/`, `ios/` etc. compatíveis com a sua versão instalada) e então comparar/mesclar as poucas customizações deste projeto (nome do app, application ID `br.com.thiagobarros.estudato`, ícone).
+### O que os testes verificam:
+- **Renderização e Usabilidade**: Renderização dos elementos da tela inicial, seletor de cargo e ação de início de simulado.
+- **Conformidade com o Edital**: Valida que cargos de Nível Superior não possuem a disciplina de Informática Básica e possuem 30 questões de Conhecimentos Específicos, enquanto Nível Médio contém Informática e 25 questões de Específicas.
+- **Distribuição do QuizEngine**: Garante que o motor gera filas válidas, balanceadas e com itens específicos do cargo selecionado.
 
-## Próximos passos sugeridos
+---
 
-- **Ícone do app**: hoje há só um PNG simples (gerado programaticamente) em `assets/icon/icon.png` e copiado nas pastas `android/app/src/main/res/mipmap-*`. Para um ícone adaptável de verdade (todas as densidades, ícone adaptativo do Android), vale usar o pacote [`flutter_launcher_icons`](https://pub.dev/packages/flutter_launcher_icons).
-- **Mais questões**: adicione novas entradas em `lib/data/questions_data.dart` seguindo o mesmo formato (`Question(subject: ..., text: ..., options: [...], correctIndex: ..., explanation: ...)`). O `subject` precisa bater com uma das chaves em `lib/data/subjects.dart`.
-- **Conteúdo específico mais preciso**: se você tiver acesso ao Anexo I completo do edital (conteúdo programático), dá para revisar/ajustar os tópicos de Conhecimentos Específicos de Enfermagem com mais precisão ainda.
-- **Outros cargos**: para outro cargo do mesmo edital, crie um novo arquivo de questões (ou uma nova lista) e troque `subjects`/`allQuestions` — ou adicione um seletor de cargo na tela inicial.
-- **iOS**: este projeto só tem a pasta `android/`. Para gerar a pasta `ios/`, rode `flutter create --platforms=ios .` dentro do projeto.
-- **Gráfico de evolução mais rico**: a tela de histórico hoje usa um gráfico de barras simples feito à mão (sem dependências externas). Para algo mais elaborado, o pacote [`fl_chart`](https://pub.dev/packages/fl_chart) é uma opção popular.
+## 📦 Geração de Build (Android APK & Web)
+
+### Gerar APK para Instalação no Celular
+
+```bash
+flutter build apk --release
+```
+O arquivo `.apk` gerado estará disponível em:
+`build/app/outputs/flutter-apk/app-release.apk`
+
+> 💡 **Nota sobre assinatura do APK**: O `build.gradle` padrão assina a versão release com as chaves de teste para facilitar testes diretos no celular. Para publicação na Google Play Store, configure sua chave própria seguindo o [guia oficial de assinatura do Flutter](https://docs.flutter.dev/deployment/android#signing-the-app).
+
+### Gerar Build para Web
+
+```bash
+flutter build web --release
+```
+Os arquivos estáticos serão gerados na pasta `build/web/`, prontos para deploy no GitHub Pages, Vercel ou Firebase Hosting.
+
+---
+
+## 🔮 Próximos Passos e Extensibilidade
+
+- [ ] **Expansão Contínua do Banco**: Adicionar novas questões em `lib/data/role_questions.dart` e `lib/data/questions_data.dart`.
+- [ ] **Filtro de Histórico por Cargo**: Opção de alternar a visualização das médias globais por cargo individual no `HistoryScreen`.
+- [ ] **Modo Simulado Cronometrado**: Adição de temporizador regressivo simulando as 4 horas de duração da prova real.
+- [ ] **Geração de Ícones Automatizada**: Configuração do pacote [`flutter_launcher_icons`](https://pub.dev/packages/flutter_launcher_icons) para ícones adaptativos do Android.
+- [ ] **Modo Noturno (Dark Theme)**: Suporte a tema escuro para estudos noturnos prolongados.
